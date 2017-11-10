@@ -58,6 +58,6 @@ msgRouter.applyRoutes(server, '/msg')
 rootRouter.applyRoutes(server); //Apply routes
 /* END */
 
-server.listen(3000, function () { console.log('%s listening at %s', server.name, server.url); });
+server.listen(8080, function () { console.log('%s listening at %s', server.name, server.url); });
 
 module.exports.server = server;
