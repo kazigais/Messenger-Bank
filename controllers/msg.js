@@ -4,6 +4,7 @@ const Wit = require('node-wit').Wit;
 const log = require('node-wit').log;
 const FB_PAGE_TOKEN = "EAAVB0t4bEicBAJTOpuI82fBoZBZAeedeAITUvdHbBhvH71jqOA8fvpQDCot1dQ0WgI5mY1KJZBpvIbCW39F7L0pD0gBOdfTOg37WFvLLDXmAgvRmVsxJ2RxQeKlt5wtGgYFIlZBZBHjxVYVqTkeLFA7tFIMFx6zODWfBMAHrCrgZDZD";
 const WIT_TOKEN = "ZNAZKF2XUKTFS2G7ZLLBGDHJMB6DC4AP";
+const auth = require('./auth');
 
 // ----------------------------------------------------------------------------
 // Messenger API specific code
@@ -134,6 +135,8 @@ exports.post = function(req, res) {
             // We received a text message
 						wit.message(text, sessions[sessionId].context)
 						.then((body) => {
+              //receive!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+              auth.testTemplate('Log in', event.sender.id, event.recipient.id);
 							console.log(body);
 						})
 						.catch(console.error);

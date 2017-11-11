@@ -71,27 +71,46 @@ exports.signUp = function(req, res){
                 return;
               }
               res.json(201, {"message":"Bank account created"});
-            });
-          });
-        });
-      });
-    });
-  });
+            }); //Save
+          }); //request
+        }); //Delay
+      }); //Request
+    }); //delay
+  }); //request
 }
 
 
-// export.interTransaction = function(req, res){
-//   const params =
-//     {
-//       "ledger_from_id": req.body.from,
-//       "ledger_to_id": req.body.to,
-//       "amount": req.body.amount
-//     };
-//     request.post({url:"https://play.railsbank.com/v1/customer/transactions/inter-ledger", json:IBANParams, headers:{"Content-Type":"application/json", "Authorization":API_KEY}}, function(err,httpResponse,body){
-//       if(err){
-//         res.send(err);
-//         return;
-//       }
-//       res.json(201, {"message":"Transaction complete!"});
-//     });
-//   }
+exports.interTransaction = function(req, res){
+  const params =
+    {
+      "ledger_from_id": req.body.from,
+      "ledger_to_id": req.body.to,
+      "amount": req.body.amount
+    };
+    request.post({url:"https://play.railsbank.com/v1/customer/transactions/inter-ledger", json:IBANParams, headers:{"Content-Type":"application/json", "Authorization":API_KEY}}, function(err,httpResponse,body){
+      if(err){
+        res.send(err);
+        return;
+      }
+      res.json(201, {"message":"Transaction complete!"});
+    });
+  }
+
+exports.setDebt = function(req, res){
+  const params ={
+    "receiver_id":req.body.receiver_id,
+    "lender_id":req.body.lender_id,
+    "amount":req.body.amount
+  };
+
+}
+
+exports.template = function(req, res){
+  var body = '<html><body>hello</body></html>';
+  res.writeHead(200, {
+  'Content-Length': Buffer.byteLength(body),
+  'Content-Type': 'text/html'
+  });
+  res.write(body);
+  res.end();
+}

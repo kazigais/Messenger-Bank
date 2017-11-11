@@ -10,6 +10,7 @@ const restify          = require('restify'),
 /* ROUTES */
 const msgRouter   = require('./routes/msg');
 const bankRouter   = require('./routes/bank');
+const authRouter   = require('./routes/auth');
 /* END */
 
 /* MIDDLEWARE */
@@ -54,6 +55,7 @@ rootRouter.get('/', function (req, res, next) { res.json(200, {message:"Roger Ro
 
 msgRouter.applyRoutes(server, '/webhook')
 bankRouter.applyRoutes(server, '/bank')
+authRouter.applyRoutes(server, '/auth/facebook/test/')
 // userRouter.applyRoutes(server, '/users'); //Set route pre-fix
 // locationRouter.applyRoutes(server, '/locations'); //Set route pre-fix and apply routes
 rootRouter.applyRoutes(server); //Apply routes
