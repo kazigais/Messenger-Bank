@@ -2,7 +2,7 @@ const request = require('request');
 const fetch = require('fetch');
 const Wit = require('node-wit').Wit;
 const log = require('node-wit').log;
-const FB_PAGE_TOKEN = "EAAVB0t4bEicBAJTOpuI82fBoZBZAeedeAITUvdHbBhvH71jqOA8fvpQDCot1dQ0WgI5mY1KJZBpvIbCW39F7L0pD0gBOdfTOg37WFvLLDXmAgvRmVsxJ2RxQeKlt5wtGgYFIlZBZBHjxVYVqTkeLFA7tFIMFx6zODWfBMAHrCrgZDZD";
+const FB_PAGE_TOKEN = "EAAVB0t4bEicBALzuAuzCqcWUiUb8qStGfZBQh8SDtPThfDacRxnoAfXYEkrZA5ZBpjT2CYZCeBIadIiCpJ66tz5Pg9egKTCnqyaraTIVND9vzSbaKJrmcKwAzDXkuneICNzF4XhwBsdmed88FSdgXHC8ZCDE50ymiPRZBEDXEsS8jESSfsHfyo";
 const WIT_TOKEN = "ZNAZKF2XUKTFS2G7ZLLBGDHJMB6DC4AP";
 
 // ----------------------------------------------------------------------------
@@ -94,7 +94,7 @@ const wit = new Wit({
 
 
 exports.get = function(req, res){
-  if (req.query['hub.verify_token'] === 'EAAVB0t4bEicBALYrU0Epv3pmXZAn9bf47zjDz9aZCrybB2GCiFKZCkZA3vOOHqtjZBdjZAQO328NddYG0SaqxjNBmkHYmZCu6FvzmotSKrZBnKvrmMjZBwQYajgrF7ieeLL8hPbO1sQ1qw1ZCKlgUqaoBh6oweu3841zCBLubOZA8B4DwZDZD') {
+  if (req.query['hub.verify_token'] === 'EAAVB0t4bEicBALzuAuzCqcWUiUb8qStGfZBQh8SDtPThfDacRxnoAfXYEkrZA5ZBpjT2CYZCeBIadIiCpJ66tz5Pg9egKTCnqyaraTIVND9vzSbaKJrmcKwAzDXkuneICNzF4XhwBsdmed88FSdgXHC8ZCDE50ymiPRZBEDXEsS8jESSfsHfyo') {
 		console.log(req.query['hub.challenge']);
 		console.log(req.query['hub.challenge'][0]);
 		res.contentType = "text/plain";
@@ -130,11 +130,17 @@ exports.post = function(req, res) {
             fbMessage(sender, 'Sorry I can only process text messages for now.')
             .catch(console.error);
           } else if (text) {
-          	console.log("Here")
             // We received a text message
 						wit.message(text, sessions[sessionId].context)
 						.then((body) => {
-							console.log(body);
+							console.log(body.entities);
+							console.log(sessions[sessionId].fbid);
+							const qs = 'access_token=' + encodeURIComponent(FB_PAGE_TOKEN);
+							request('https://graph.facebook.com/v2.9/'+ sessions[sessionId].fbid+'?fields=id,gender,email&' + qs, function (error, response, body) {
+							  console.log('error:', error); // Print the error if one occurred
+							  console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+							  console.log('body:', body); // Print the HTML for the Google homepage.
+							});
 						})
 						.catch(console.error);
 
