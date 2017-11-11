@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/kazigais/Messenger-Bank#readme",
   "dependencies": {
+    "delay": "^2.0.0",
     "fetch": "^1.1.0",
     "mongoose": "^4.13.1",
     "morgan": "^1.9.0",
