@@ -7,7 +7,6 @@ const restify          = require('restify'),
       Router           = require('restify-router').Router, //Express like routing for restify
       rootRouter       = new  Router(); //Initialise new router instance
 /* END */
-
 /* ROUTES */
 const msgRouter   = require('./routes/msg');
 /* END */
@@ -44,12 +43,6 @@ process.env.SECRET_KEY = "KEYBOARD NINJA CAT"; //Secret key for jwt token genera
 /* END */
 
 /* TEST ROUTE */
-rootRouter.get('/webhook/', function (req, res) {
-	if (req.query['hub.verify_token'] === 'EAAVB0t4bEicBALYrU0Epv3pmXZAn9bf47zjDz9aZCrybB2GCiFKZCkZA3vOOHqtjZBdjZAQO328NddYG0SaqxjNBmkHYmZCu6FvzmotSKrZBnKvrmMjZBwQYajgrF7ieeLL8hPbO1sQ1qw1ZCKlgUqaoBh6oweu3841zCBLubOZA8B4DwZDZD') {
-		return res.send(req.query['hub.challenge'])
-	}
-	return res.send('Error, wrong token')
-})
 rootRouter.get('/', function (req, res, next) { res.json(200, {message:"Roger Roger"}); }); //Basic test call (Authentication required)
 /* END */
 
@@ -58,7 +51,7 @@ rootRouter.get('/', function (req, res, next) { res.json(200, {message:"Roger Ro
 // locationRouter.use(auth.authenticate); //Apply authentication middleware for locationRoutes
 // rootRouter.use(auth.authenticate);     //Apply authentication middleware for rootRoutes
 
-msgRouter.applyRoutes(server, '/msg')
+msgRouter.applyRoutes(server, '/webhook')
 // userRouter.applyRoutes(server, '/users'); //Set route pre-fix
 // locationRouter.applyRoutes(server, '/locations'); //Set route pre-fix and apply routes
 rootRouter.applyRoutes(server); //Apply routes

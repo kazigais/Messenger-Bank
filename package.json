@@ -17,8 +17,11 @@
   },
   "homepage": "https://github.com/kazigais/Messenger-Bank#readme",
   "dependencies": {
+    "fetch": "^1.1.0",
     "mongoose": "^4.13.1",
     "morgan": "^1.9.0",
+    "node-wit": "^4.3.0",
+    "request": "^2.83.0",
     "restify": "^6.3.2",
     "restify-cors-middleware": "^1.0.1",
     "restify-router": "^0.5.0"
