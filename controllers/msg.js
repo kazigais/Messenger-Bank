@@ -89,7 +89,6 @@ const actions = {
 // Setting up our bot
 const wit = new Wit({
   accessToken: WIT_TOKEN,
-  actions,
   logger: new log.Logger(log.INFO)
 });
 
@@ -131,32 +130,38 @@ exports.post = function(req, res) {
             fbMessage(sender, 'Sorry I can only process text messages for now.')
             .catch(console.error);
           } else if (text) {
+          	console.log("Here")
             // We received a text message
+						wit.message(text, sessions[sessionId].context)
+						.then((body) => {
+							console.log(body);
+						})
+						.catch(console.error);
 
             // Let's forward the message to the Wit.ai Bot Engine
             // This will run all actions until our bot has nothing left to do
-            wit.runActions(
-              sessionId, // the user's current session
-              text, // the user's message
-              sessions[sessionId].context // the user's current session state
-            ).then((context) => {
-              // Our bot did everything it has to do.
-              // Now it's waiting for further messages to proceed.
-              console.log('Waiting for next user messages');
+            // wit.runActions(
+            //   sessionId, // the user's current session
+            //   text, // the user's message
+            //   sessions[sessionId].context // the user's current session state
+            // ).then((context) => {
+            //   // Our bot did everything it has to do.
+            //   // Now it's waiting for further messages to proceed.
+            //   console.log('Waiting for next user messages');
 
-              // Based on the session state, you might want to reset the session.
-              // This depends heavily on the business logic of your bot.
-              // Example:
-              // if (context['done']) {
-              //   delete sessions[sessionId];
-              // }
+            //   // Based on the session state, you might want to reset the session.
+            //   // This depends heavily on the business logic of your bot.
+            //   // Example:
+            //   // if (context['done']) {
+            //   //   delete sessions[sessionId];
+            //   // }
 
-              // Updating the user's current session state
-              sessions[sessionId].context = context;
-            })
-            .catch((err) => {
-              console.error('Oops! Got an error from Wit: ', err.stack || err);
-            })
+            //   // Updating the user's current session state
+            //   sessions[sessionId].context = context;
+            // })
+            // .catch((err) => {
+            //   console.error('Oops! Got an error from Wit: ', err.stack || err);
+            // })
           }
         } else {
           console.log('received event', JSON.stringify(event));
@@ -165,22 +170,4 @@ exports.post = function(req, res) {
     });
   }
   res.send(200);
-}
-function sendTextMessage(sender, text) {
-    let messageData = { text:text }
-    request({
-	    url: 'https://graph.facebook.com/v2.6/me/messages',
-	    qs: {access_token:token},
-	    method: 'POST',
-		json: {
-		    recipient: {id:sender},
-			message: messageData,
-		}
-	}, function(error, response, body) {
-		if (error) {
-		    console.log('Error sending messages: ', error)
-		} else if (response.body.error) {
-		    console.log('Error: ', response.body.error)
-	    }
-    })
 }
