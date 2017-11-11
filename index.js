@@ -46,9 +46,9 @@ process.env.SECRET_KEY = "KEYBOARD NINJA CAT"; //Secret key for jwt token genera
 /* TEST ROUTE */
 rootRouter.get('/webhook/', function (req, res) {
 	if (req.query['hub.verify_token'] === 'EAAVB0t4bEicBALYrU0Epv3pmXZAn9bf47zjDz9aZCrybB2GCiFKZCkZA3vOOHqtjZBdjZAQO328NddYG0SaqxjNBmkHYmZCu6FvzmotSKrZBnKvrmMjZBwQYajgrF7ieeLL8hPbO1sQ1qw1ZCKlgUqaoBh6oweu3841zCBLubOZA8B4DwZDZD') {
-		res.send(req.query['hub.challenge'])
+		return res.send(req.query['hub.challenge'])
 	}
-	res.send('Error, wrong token')
+	return res.send('Error, wrong token')
 })
 rootRouter.get('/', function (req, res, next) { res.json(200, {message:"Roger Roger"}); }); //Basic test call (Authentication required)
 /* END */
