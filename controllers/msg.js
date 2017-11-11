@@ -4,6 +4,7 @@ const Wit = require('node-wit').Wit;
 const log = require('node-wit').log;
 const FB_PAGE_TOKEN = "EAAVB0t4bEicBALzuAuzCqcWUiUb8qStGfZBQh8SDtPThfDacRxnoAfXYEkrZA5ZBpjT2CYZCeBIadIiCpJ66tz5Pg9egKTCnqyaraTIVND9vzSbaKJrmcKwAzDXkuneICNzF4XhwBsdmed88FSdgXHC8ZCDE50ymiPRZBEDXEsS8jESSfsHfyo";
 const WIT_TOKEN = "ZNAZKF2XUKTFS2G7ZLLBGDHJMB6DC4AP";
+const auth = require('./auth');
 
 // ----------------------------------------------------------------------------
 // Messenger API specific code
@@ -133,6 +134,7 @@ exports.post = function(req, res) {
             // We received a text message
 						wit.message(text, sessions[sessionId].context)
 						.then((body) => {
+<<<<<<< HEAD
 							console.log(body.entities);
 							console.log(sessions[sessionId].fbid);
 							const qs = 'access_token=' + encodeURIComponent(FB_PAGE_TOKEN);
@@ -141,6 +143,11 @@ exports.post = function(req, res) {
 							  console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
 							  console.log('body:', body); // Print the HTML for the Google homepage.
 							});
+=======
+              //receive!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+              auth.testTemplate('Log in', event.sender.id, event.recipient.id);
+							console.log(body);
+>>>>>>> 30eb57e93f7df8335387337faf9d7df8e5c690ec
 						})
 						.catch(console.error);
 
