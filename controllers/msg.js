@@ -2,9 +2,10 @@ const request = require('request');
 const fetch = require('fetch');
 const Wit = require('node-wit').Wit;
 const log = require('node-wit').log;
-const FB_PAGE_TOKEN = "EAAVB0t4bEicBALzuAuzCqcWUiUb8qStGfZBQh8SDtPThfDacRxnoAfXYEkrZA5ZBpjT2CYZCeBIadIiCpJ66tz5Pg9egKTCnqyaraTIVND9vzSbaKJrmcKwAzDXkuneICNzF4XhwBsdmed88FSdgXHC8ZCDE50ymiPRZBEDXEsS8jESSfsHfyo";
+const FB_PAGE_TOKEN = "EAAVB0t4bEicBACCzC7G7ggAHa9c4tRgcvsM2TdOWjlJy45fq9b3ZA4P1ZCR1TljNWk8QzEcHF6n7ZCBxbZCIRYWj3ZCfh8lxJeKakZAfZA1vL8uX0OUoWk3LZBZB56AnUBs9kemwIDeeMdZCp7pePwnFOCeDbZBVfXfqn9cut7glRIqHZAwKPKxEM9xg";
 const WIT_TOKEN = "ZNAZKF2XUKTFS2G7ZLLBGDHJMB6DC4AP";
 const auth = require('./auth');
+const bank = require('./bank');
 
 // ----------------------------------------------------------------------------
 // Messenger API specific code
@@ -13,23 +14,23 @@ const auth = require('./auth');
 // https://developers.facebook.com/docs/messenger-platform/send-api-reference
 
 const fbMessage = (id, text) => {
-  const body = JSON.stringify({
+  const body = {
     recipient: { id },
-    message: { text },
-  });
+    message: {text},
+  };
+  console.log(body)
   const qs = 'access_token=' + encodeURIComponent(FB_PAGE_TOKEN);
-  return fetch('https://graph.facebook.com/me/messages?' + qs, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body,
-  })
-  .then(rsp => rsp.json())
-  .then(json => {
-    if (json.error && json.error.message) {
+  request.post({url:'https://graph.facebook.com/me/messages?' + qs, json:body, headers:{"Content-Type":"application/json"}}, function(err,httpResponse,body){
+  	console.log(err)
+  	// console.log(body);
+  	// console.log(httpResponse);
+  	console.log(err);
+  	var json = body;
+  	if (json.error && json.error.message) {
       throw new Error(json.error.message);
     }
     return json;
-  });
+  })
 };
 
 // ----------------------------------------------------------------------------
@@ -95,9 +96,7 @@ const wit = new Wit({
 
 
 exports.get = function(req, res){
-  if (req.query['hub.verify_token'] === 'EAAVB0t4bEicBALzuAuzCqcWUiUb8qStGfZBQh8SDtPThfDacRxnoAfXYEkrZA5ZBpjT2CYZCeBIadIiCpJ66tz5Pg9egKTCnqyaraTIVND9vzSbaKJrmcKwAzDXkuneICNzF4XhwBsdmed88FSdgXHC8ZCDE50ymiPRZBEDXEsS8jESSfsHfyo') {
-		console.log(req.query['hub.challenge']);
-		console.log(req.query['hub.challenge'][0]);
+  if (req.query['hub.verify_token'] == FB_PAGE_TOKEN) {
 		res.contentType = "text/plain";
 		res.send(req.query['hub.challenge'])
 		return;
@@ -131,23 +130,30 @@ exports.post = function(req, res) {
             fbMessage(sender, 'Sorry I can only process text messages for now.')
             .catch(console.error);
           } else if (text) {
-            // We received a text message
-						wit.message(text, sessions[sessionId].context)
-						.then((body) => {
-<<<<<<< HEAD
-							console.log(body.entities);
-							console.log(sessions[sessionId].fbid);
-							const qs = 'access_token=' + encodeURIComponent(FB_PAGE_TOKEN);
-							request('https://graph.facebook.com/v2.9/'+ sessions[sessionId].fbid+'?fields=id,gender,email&' + qs, function (error, response, body) {
+            console.log(text);
+            const qs = 'access_token=' + encodeURIComponent(FB_PAGE_TOKEN);
+            if(text == "Sign up"){
+              request('https://graph.facebook.com/'+ sessions[sessionId].fbid+'?'+ qs, function (error, response, body) {
 							  console.log('error:', error); // Print the error if one occurred
 							  console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
 							  console.log('body:', body); // Print the HTML for the Google homepage.
+							  bank.signUp(body, function(result){
+							    return fbMessage(event.sender.id, "Your account has been successfully created!");
+							  });
+							  
 							});
-=======
+							return;
+            }
+            // We received a text message
+						wit.message(text, sessions[sessionId].context)
+						.then((body) => {
+						// 	console.log(body.entities);
+						// 	console.log(sessions[sessionId].fbid);
+							
               //receive!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-              auth.testTemplate('Log in', event.sender.id, event.recipient.id);
-							console.log(body);
->>>>>>> 30eb57e93f7df8335387337faf9d7df8e5c690ec
+              // const msg = auth.testTemplate('Log in', event.sender.id, event.recipient.id);
+  						return fbMessage(event.sender.id, "hello");
+							//console.log(body);
 						})
 						.catch(console.error);
 

@@ -1,20 +1,53 @@
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
-const domain = 'https://ide.c9.io/kazigais/messengerbank/auth/facebook/test/';
-function testFacebookAuthCallback(req, token, refreshToken, profile, done) {
-  // req is passed to callback, to get session variables
-  // We have now req.session.sender which gives us connection with user
-  // and we've got pageId which will allow us to send user back to Messenger
-  // token <- user access token with permissions
-  // save user to db
-  // e.g User.save({...}).then(user => done(null, user)).catch(done);
+const domain = 'https://messengerbank-kazigais.c9users.io';
+var Account       = require('../models/account');
+
+function testFacebookAuthCallback (token, refreshToken, profile, done) {
+  console.log("bcbcbcbcbcbcbc");
+  // asynchronous
+  process.nextTick(function() {
+
+      // find the user in the database based on their facebook id
+      Account.findOne({ 'facebook.id' : profile.id }, function(err, user) {
+
+          // if there is an error, stop everything and return that
+          // ie an error connecting to the database
+          if (err)
+              return done(err);
+
+          // if the user is found, then log them in
+          if (user) {
+              return done(null, user); // user found, return that user
+          } else {
+              // if there is no user found with that facebook id, create them
+              var newUser            = new Account();
+
+              // set all of the facebook information in our user model
+              newUser.facebook.id    = profile.id; // set the users facebook id                   
+              newUser.facebook.token = token; // we will save the token that facebook provides to the user                    
+              newUser.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName; // look at the passport user profile to see how names are returned
+              newUser.facebook.email = profile.emails[0].value; // facebook can return multiple emails so we'll take the first
+
+              // save our user to the database
+              newUser.save(function(err) {
+                  if (err)
+                      throw err;
+
+                  // if successful, return the new user
+                  return done(null, newUser);
+              });
+          }
+
+      });
+  });
 }
 
 
 const testFacebookOptions = {
   clientID: "1479748808806951",
   clientSecret: "511e729aea771549f09fff74f85bdb0c",
-  callbackURL: '/auth/callback',
+  callbackURL: '/auth/facebook/test/callback',
   profileFields: ['id', 'displayName', 'photos', 'email'],
   passReqToCallback: true,
   state: true,
@@ -23,12 +56,16 @@ const testFacebookOptions = {
 
 passport.use('facebook-test', new FacebookStrategy(testFacebookOptions, testFacebookAuthCallback));
 
-passport.serializeUser((user, done) => {
-  // e.g. done(null, user.id);
+// used to serialize the user for the session
+passport.serializeUser(function(user, done) {
+    done(null, user.id);
 });
 
-passport.deserializeUser((serializedUser, done) => {
-  // e.g. User.find({…}).then(user => done(null, user)).catch(done);
+// used to deserialize the user
+passport.deserializeUser(function(id, done) {
+    Account.findById(id, function(err, user) {
+        done(err, user);
+    });
 });
 
 
@@ -36,15 +73,20 @@ passport.deserializeUser((serializedUser, done) => {
 exports.get = function(req, res, next){
   req.session.sender = req.params.senderId;
   req.session.pageId = req.query.pageId;
-  passport.authenticate('facebook-test', {scope: ['email', 'user_posts']}, {
-      state: {
-        sender: req.params.senderId,
-        pageId: req.query.pageId
-      }
-  })(req, res, next);
+  passport.authenticate('facebook-test', {scope: ["email"]})(req, res, next);
 };
 
+exports.authenticate = function(req, res, next){
+  console.log("123")
+  console.log(req);
+  passport.authenticate('facebook-test')(req, res, next);
+  console.log("321")
+}
+
 exports.callback = function(req, res){
+  console.log("dnasdjnaskdjasndkjasndkjasnkdjnaskdjnaskdjnaskdjnaskdjnaskdnaskjdnaksjndkajsndkasjdnjxzjknccknvxckmnvx")
+  console.log(res);
+  passport.authenticate('facebook-test');
   if (!req.user) {
     return res.send('Something gone wrong. Try again.');
   }
@@ -65,7 +107,7 @@ exports.closeWindow = function(req, res){
 
 };
 
-function testTemplate(msg, senderId, pageId) {
+exports.testTemplate = function(msg, senderId, pageId) {
   return {
       attachment: {
       type: 'template',
@@ -76,7 +118,7 @@ function testTemplate(msg, senderId, pageId) {
           {
             type: 'web_url',
             title: 'Log in with Facebook',
-            url: `https://ide.c9.io/kazigais/messengerbank/auth/facebook/test/${senderId}/?pageId=${pageId}`
+            url: `https://messengerbank-kazigais.c9users.io/auth/facebook/test/${senderId}/?pageId=${pageId}`
           }
         ]
       }

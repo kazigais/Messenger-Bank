@@ -4,21 +4,26 @@ const delay   = require('delay');
 
 const API_KEY = "API-Key ISYJzWWvY155g6AlMIalnaSLDDVeW9LX#jyL7sO6933GEIGcdh8ikvCEVdYdTWgsrx7EJ7U06RVZTVL9hY2KjVeB3Nefny2mV";
 
-exports.signUp = function(req, res){
-  console.log(req.body.name);
-  console.log(req.body.email);
-  console.log(req.body.iban);
-  console.log(req.body.bic);
+exports.signUp = function(body, cb){
+  body = JSON.parse(body);
+  body.id = body.id;
+  body.name = body.first_name + " " + body.last_name;
+  body.iban = "SK4402005678901234567893";
+  body.bic = "SPSRSKBAKAS";
+  console.log(body);
+  console.log(body.body);
+  console.log(body[0]);
+  console.log(body.name);
+  console.log(body.iban);
   const userParams = {
       "person":{
-        "name":req.body.name,
-        "email":req.body.email
+        "name":body.name
       }
   }
   //Create USER entity
   request.post({url:"https://play.railsbank.com/v1/customer/endusers", json:userParams, headers:{"Content-Type":"application/json", "Authorization":API_KEY}}, function(err,httpResponse,body){
     if(err){
-      res.send(err);
+      //res.send(err);
       return;
     }
     const enduser_id = body.enduser_id;
@@ -39,7 +44,7 @@ exports.signUp = function(req, res){
       //Create Ledger
       request.post({url:"https://play.railsbank.com/v1/customer/ledgers", json:ledgerParams, headers:{"Content-Type":"application/json", "Authorization":API_KEY}}, function(err,httpResponse,body){
         if(err){
-          res.send(err);
+          //res.send(err);
           return;
         }
         console.log(body);
@@ -47,19 +52,19 @@ exports.signUp = function(req, res){
         console.log("Ledger ID: "+ledger_id);
         const IBANParams =
         {
-          "iban": req.body.iban,
-          "bic_swift": req.body.bic
+          "iban": body.iban,
+          "bic_swift": body.bic
         }
         delay(10000).then(() => {
           //Add IBAN to Ledger
           request.post({url:"https://play.railsbank.com/v1/customer/ledgers/"+body.ledger_id+"/assign-iban", json:IBANParams, headers:{"Content-Type":"application/json", "Authorization":API_KEY}}, function(err,httpResponse,body){
             if(err){
-              res.send(err);
+              //res.send(err);
               return;
             }
-            newAccount = new Account(
+            let newAccount = new Account(
               {
-                "facebook_id":req.body.facebook_id,
+                "facebook_id":body.id,
                 "ledger_id": ledger_id,
                 "enduser_id": enduser_id
               }
@@ -67,10 +72,11 @@ exports.signUp = function(req, res){
             newAccount.save(function(err, result){
               if(err){
                 console.log(err);
-                res.send(400, {"error":"Error saving data. Please try again later..."});
+                //res.send(400, {"error":"Error saving data. Please try again later..."});
                 return;
               }
-              res.json(201, {"message":"Bank account created"});
+              cb(null);
+              //res.json(201, {"message":"Bank account created"});
             }); //Save
           }); //request
         }); //Delay

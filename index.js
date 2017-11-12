@@ -5,7 +5,11 @@ const restify          = require('restify'),
       morgan           = require('morgan'), //Debug library
       corsMiddleware   = require('restify-cors-middleware'), // CORS
       Router           = require('restify-router').Router, //Express like routing for restify
-      rootRouter       = new  Router(); //Initialise new router instance
+      rootRouter       = new  Router(), //Initialise new router instance
+      session = require('restify-session')({
+        debug : true,
+        ttl   : 2
+    });
 /* END */
 /* ROUTES */
 const msgRouter   = require('./routes/msg');
@@ -30,6 +34,7 @@ server.use(restify.plugins.acceptParser(server.acceptable));
 server.use(restify.plugins.queryParser()); //Query parser for payload
 server.use(restify.plugins.bodyParser()); //Body parser to get payload
 server.use(morgan('dev')); //Initialise morgan logger on 'dev' preset
+server.use(session.sessionManager) //session
 const cors = corsMiddleware({ //CORS setup
   preflightMaxAge: 5, //Optional
   origins: ['*'],

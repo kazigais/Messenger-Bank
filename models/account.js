@@ -3,7 +3,12 @@ const mongoose              = require('mongoose'),
 
 const AccountSchema = new Schema(
   {
-    facebook_id        : { type:String, required:false },
+    facebook       : {
+      id           : String,
+      token        : String,
+      email        : String,
+      name         : String
+    },
     ledger_id          : { type:String, required:true },
     enduser_id         : { type:String, required:true }
   },
